@@ -4,7 +4,7 @@ function Footer() {
 
 
   return (
-    <footer>
+    <footer className="flex items-center justify-center bg-gray-800 text-white py-6 mt-10">
     <p>
         CopyRights© {new Date().getFullYear()}
     </p>
