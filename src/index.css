@@ -10,5 +10,5 @@
 } 
 
 body {
-  @apply flex items-center justify-center h-screen bg-gray-400 fontFamily;
+  @apply bg-gray-400;
 }
