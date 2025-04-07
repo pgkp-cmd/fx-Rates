@@ -36,6 +36,4 @@ const customerFeedback = [
     }
 ];
 
-export default  CustomerExperience;
-
   
