@@ -1,10 +1,13 @@
 import React,{useState, useEffect} from 'react'
 import CurrencySelect from './CurrencySelect'
+
 const ConvertArea = () => {
-const [amount, setAmount] = useState(0); // Default amount is set to 0
+const [amount, setAmount] = useState(1); // Default amount is set to 0
 const [fromCurrency, setFromCurrency] = useState('USD');
 const [toCurrency, setToCurrency] = useState('KES');
 const [result, setResult] = useState("");
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState(null);
 
 
 //function to handle swap of currencies from their positions
@@ -16,23 +19,39 @@ const handleCurrencySwap = () => {
 
 //Fetching exchange rates when the component mounts or when currencies change
 const exchangeRates = async () => {
-  const API_URL_KEY = import.meta.env.REACT_APP_EXCHANGE_RATE_API_KEY; //API key from .env file
-  const API_URL = ` https://v6.exchangerate-api.com/v6/${API_URL_KEY}/pair/${fromCurrency}/${toCurrency}`;
-
+  setLoading(true);
+  setError(null);
   try {
-    const respond = await fetch(API_URL);
-    if (!respond.ok) {
-      throw new Error("There was an error fetching the exchange rates. Please try again later.");
+    const API_URL_KEY = import.meta.env.VITE_API_KEY;
+    const API_URL = `https://v6.exchangerate-api.com/v6/${API_URL_KEY}/pair/${fromCurrency}/${toCurrency}`;
+
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error(
+        'There was an error fetching the exchange rates. Please try again later.'
+      );
     }
 
-    const data = await respond.json();
-    const exchangeRate = (data.conversion_rate * amount).toFixed(2); // Calculate the converted amount and round to 2 decimal places
-    console.log(data);
-    setResult($`${amount} ${fromCurrency} = ${exchangeRate} ${toCurrency}`);
-  } catch (error) {
-    console.error(error);
+    const data = await response.json();
+    if (data.result === 'success') {
+      const exchangeRate = (data.conversion_rate * amount).toFixed(2);
+      setResult(`${amount} ${fromCurrency} = ${exchangeRate} ${toCurrency}`);
+    } else {
+      throw new Error(data['error-type'] || "API error");
+    }
+  } catch (err) {
+    setError(err.message);
+    setResult('');
+  } finally {
+    setLoading(false);
   }
 };
+
+useEffect( () => {
+  exchangeRates();
+}
+, []);
+
 
 // State to handle form submission and fetch exchange rates when the amount or currencies change
 const handleSubmitButton = (e) => {
@@ -83,6 +102,9 @@ const handleSubmitButton = (e) => {
         
         <div className="text-center mt-4">
         <button type="submit" className="px-5 py-2 bg-indigo-500 text-white  rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ">Convert</button>
+            
+            {loading && <p>Loading...</p>}
+            {error && <p className="text-red-800">Error: {error}</p>}
 
         <p className="mt-5"><span className="text-green-300">Amount Converted</span>: {result}</p>
         </div>

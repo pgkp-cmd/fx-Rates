@@ -1,4 +1,4 @@
-import ConvertArea from "./components/ConvertrtArea.jsx"
+import ConvertArea from "./components/ConverterArea.jsx.jsx"
 import Footer from "./components/Footer"
 import Home from "./components/Home"
 import Navigation from "./components/Navbar"
